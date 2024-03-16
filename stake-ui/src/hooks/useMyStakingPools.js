@@ -8,12 +8,10 @@ import {
   decodeStakingPoolResult,
   encodeStakingPoolCall,
 } from "../utils/callEncoder";
-import { useWeb3ModalAccount } from "@web3modal/ethers/react";
 import usePoolNumbers from "./usePoolNumbers";
 import { formatEther } from "ethers";
 
 const useMyStakingPools = () => {
-  const { address } = useWeb3ModalAccount();
   const totalPools = usePoolNumbers();
   const [poolDetails, setPoolDetails] = useState([]);
   const multicallContract = getMultiCallContract(getReadOnlyProvider);
@@ -69,6 +67,7 @@ const useMyStakingPools = () => {
   useEffect(() => {
     fetchPoolDetails();
   }, [totalPools]);
+
 
   return poolDetails;
 };

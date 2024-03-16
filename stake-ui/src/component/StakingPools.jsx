@@ -132,6 +132,7 @@ const StakingPools = () => {
                       }
                       className="font-medium text-white-600 dark:text-white hover:underline"
                       onClick={async () => {
+                        console.log("Unstake", index);
                         await unstake(index);
                       }}
                     >
