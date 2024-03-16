@@ -14,6 +14,7 @@ import { useWeb3ModalAccount } from "@web3modal/ethers/react";
 import useMyStakingPools from "../hooks/useMyStakingPools";
 import useStakeToken from "../hooks/useStakeToken";
 import { toast } from "react-hot-toast";
+import useUnstakeToken from "../hooks/useUnstakeToken";
 
 const StakingPools = () => {
   const { isConnected, address } = useWeb3ModalAccount();
@@ -26,6 +27,8 @@ const StakingPools = () => {
 
   const { stake, stakeLoading } = useStakeToken();
   const [amount, setAmount] = useState("");
+
+  const { unstake, unstakeLoading } = useUnstakeToken();
 
   return isConnected && address ? (
     <div className="mt-8">
@@ -101,7 +104,7 @@ const StakingPools = () => {
                             <Button
                               variant="soft"
                               color="blue"
-                              disabled={stakeLoading}
+                              disabled={stakeLoading || unstakeLoading}
                               onClick={async () => {
                                 if (amount <= 0)
                                   return toast.error(
@@ -110,22 +113,6 @@ const StakingPools = () => {
                                 await stake(index, amount);
                                 setAmount("");
                               }}
-                              // onClick={async () => {
-                              //   if (rewardRate <= 0)
-                              //     return toast.error(
-                              //       "Reward rate must be greater than 0"
-                              //     );
-                              //   if (isNaN(Number(rewardRate)))
-                              //     return toast.error(
-                              //       "Require number for reward rate"
-                              //     );
-                              //   if (rewardBalance < rewardTokenAmountNeeded)
-                              //     return toast.error(
-                              //       "Balance to small to create staking pool"
-                              //     );
-                              //   await createStakingPool(rewardRate);
-                              //   setRewardRate("");
-                              // }}
                             >
                               Stake
                             </Button>
@@ -134,9 +121,11 @@ const StakingPools = () => {
                       </Dialog.Content>
                     </Dialog.Root>
                     <Button
-                      href="#"
+                      disabled={stakeLoading || unstakeLoading}
                       className="font-medium text-white-600 dark:text-white hover:underline"
-                      // onClick={}
+                      onClick={async () => {
+                        await unstake(index);
+                      }}
                     >
                       Unstake
                     </Button>
