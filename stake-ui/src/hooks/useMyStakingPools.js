@@ -48,7 +48,7 @@ const useMyStakingPools = () => {
           false,
           calls
         );
-        console.log(response);
+
         const decodedResponse = response.map((res) =>
           decodeStakingPoolResult("getPoolByID", res[1])
         );
