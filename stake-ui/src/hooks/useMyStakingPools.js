@@ -1,102 +1,76 @@
-// import { ethers } from "ethers";
-// import erc721 from "../constants/erc721.json";
-// import multicallAbi from "../constants/multicall.json";
-// import { readOnlyProvider } from "../constants/providers";
-// import { useEffect, useMemo, useState } from "react";
-// import { useWeb3ModalAccount } from "@web3modal/ethers/react";
-// import useTransferEvent from "./useTransferEvent";
-
-// const useMyNfts = () => {
-//   const { address } = useWeb3ModalAccount();
-//   const [data, setData] = useState([]);
-//   const [idToAddress, setIdToAddress] = useState({});
-//   const tokenIDs = useMemo(
-//     () => [...Array.from({ length: 30 })].map((_, index) => index),
-//     []
-//   );
-//   const handleEvent = useTransferEvent();
-
-//   useEffect(() => {
-//     (async () => {
-//       const itf = new ethers.Interface(erc721);
-//       const calls = tokenIDs.map((x) => ({
-//         target: import.meta.env.VITE_contract_address,
-//         callData: itf.encodeFunctionData("ownerOf", [x]),
-//       }));
-
-//       const multicall = new ethers.Contract(
-//         import.meta.env.VITE_multicall_address,
-//         multicallAbi,
-//         readOnlyProvider
-//       );
-
-//       const callResults = await multicall.tryAggregate.staticCall(false, calls);
-
-//       const validResponsesIndex = [];
-//       const validResponses = callResults.filter((x, i) => {
-//         if (x[0] === true) {
-//           validResponsesIndex.push(i);
-//           return true;
-//         }
-//         return false;
-//       });
-
-//       const decodedResponses = validResponses.map((x) =>
-//         itf.decodeFunctionResult("ownerOf", x[1])
-//       );
-
-//       const ownedTokenIds = [];
-//       const ownerAddressByIds = {};
-//       decodedResponses.forEach((addr, index) => {
-//         ownerAddressByIds[validResponsesIndex[index]] = addr.toString();
-//         if (String(addr).toLowerCase() === String(address).toLowerCase())
-//           ownedTokenIds.push(validResponsesIndex[index]);
-//       });
-//       setIdToAddress(() => ownerAddressByIds);
-//       setData(ownedTokenIds);
-//     })();
-//   }, [address, tokenIDs, handleEvent]);
-
-//   return { data, idToAddress };
-// };
-
-// export default useMyNfts;
-
-import { ethers } from "ethers";
-import erc20Abi from "../constants/erc20Abi.json";
-import multicallAbi from "../constants/multicall.json";
-import { readOnlyProvider } from "../constants/providers";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
+import { getReadOnlyProvider } from "../constants/providers";
+import {
+  getMultiCallContract,
+  getStakingPoolContract,
+} from "../constants/contracts";
+import {
+  decodeStakingPoolResult,
+  encodeStakingPoolCall,
+} from "../utils/callEncoder";
 import { useWeb3ModalAccount } from "@web3modal/ethers/react";
-import useTransferEvent from "./useTransferEvent";
+import usePoolNumbers from "./usePoolNumbers";
+import { formatEther } from "ethers";
 
 const useMyStakingPools = () => {
   const { address } = useWeb3ModalAccount();
+  const totalPools = usePoolNumbers();
+  const [poolDetails, setPoolDetails] = useState([]);
+  const multicallContract = getMultiCallContract(getReadOnlyProvider);
+  const stakingPoolContract = getStakingPoolContract(getReadOnlyProvider);
 
-  const tokenIDs = useMemo(
-    () => [...Array.from({ length: 30 })].map((_, index) => index),
-    []
-  );
+  const convertArray = (array) => {
+    return array.map((subArray) => {
+      const convertedArray = subArray.map((value, index) => {
+        if (index === 1 || index === 2) {
+          // Convert second and third values
+          return formatEther(value);
+        } else {
+          return value;
+        }
+      });
+      return convertedArray;
+    });
+  };
+  const fetchPoolDetails = async () => {
+    try {
+      // Fetch only if totalPools is greater than 0
+      if (totalPools > 0) {
+        const calls = [];
+        for (let i = 0; i < totalPools; i++) {
+          calls.push({
+            target: stakingPoolContract.target,
+            callData: encodeStakingPoolCall("getPoolByID", [i]),
+          });
+        }
+
+        const response = await multicallContract.tryAggregate.staticCall(
+          false,
+          calls
+        );
+        console.log(response);
+        const decodedResponse = response.map((res) =>
+          decodeStakingPoolResult("getPoolByID", res[1])
+        );
+        let result = decodedResponse.map((res) => res.toString().split(","));
+
+        result = convertArray(result);
+
+        setPoolDetails({ isLoading: false, data: result });
+      } else {
+        setPoolDetails({ isLoading: false, data: [] });
+      }
+    } catch (error) {
+      console.error("Error fetching pool details:", error);
+      setPoolDetails({ isLoading: false, data: [] });
+    }
+  };
 
   useEffect(() => {
-    (async () => {
-      const itf = new ethers.Interface(erc20Abi);
-      const calls = tokenIDs.map((x) => ({
-        target: import.meta.env.VITE_contract_address,
-        callData: itf.encodeFunctionData("ownerOf", [x]),
-      }));
+    fetchPoolDetails();
+  }, [totalPools]);
 
-      const multicall = new ethers.Contract(
-        import.meta.env.VITE_multicall_address,
-        multicallAbi,
-        readOnlyProvider
-      );
-
-      const callResults = await multicall.tryAggregate.staticCall(false, calls);
-    })();
-  }, [address]);
-
-  return { data, idToAddress };
+  return poolDetails;
 };
 
 export default useMyStakingPools;

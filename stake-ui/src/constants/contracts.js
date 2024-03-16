@@ -1,6 +1,7 @@
 import { ethers } from "ethers";
 import StakingAbi from "./stakingPoolAbi.json";
 import TokenAbi from "./erc20Abi.json";
+import MultiCallAbi from "./multicall.json";
 
 const stakingPoolAddress = import.meta.env.VITE_staking_contract_address;
 const tokenAddress = import.meta.env.VITE_token_contract_address;
@@ -15,4 +16,12 @@ export const getTokenContract = (providerOrSigner) => {
 };
 export const getRewardTokenContract = (providerOrSigner) => {
   return new ethers.Contract(rewardTokenAddress, TokenAbi, providerOrSigner);
+};
+
+export const getMultiCallContract = (provider) => {
+  return new ethers.Contract(
+    import.meta.env.VITE_multicall_address,
+    MultiCallAbi,
+    provider
+  );
 };

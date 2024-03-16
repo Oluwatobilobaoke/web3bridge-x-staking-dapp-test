@@ -11,36 +11,42 @@ import {
 import { formatEther } from "ethers";
 import { getReadOnlyProvider } from "../constants/providers";
 import useUserRewardTokenBalance from "../hooks/useUserRewardTokenBalance";
-import useGetLatestBlock from "../hooks/useGetLatestBlock";
 import { useWeb3ModalAccount } from "@web3modal/ethers/react";
+import useMyStakingPools from "../hooks/useMyStakingPools";
 
-let StakingPoolData = [
-  {
-    id: "0",
-    totalStakers: 20,
-    totalStaked: 33939393993,
-    rewardReserve: 1000,
-    rewardRate: 5,
-  },
-  {
-    id: "1",
-    totalStakers: 20,
-    totalStaked: 33939393993,
-    rewardReserve: 1000,
-    rewardRate: 5,
-  },
-  {
-    id: "2",
-    totalStakers: 20,
-    totalStaked: 33939393993,
-    rewardReserve: 1000,
-    rewardRate: 5,
-  },
-];
+// let StakingPoolData = [
+//   {
+//     id: "0",
+//     totalStakers: 20,
+//     totalStaked: 33939393993,
+//     rewardReserve: 1000,
+//     rewardRate: 5,
+//   },
+//   {
+//     id: "1",
+//     totalStakers: 20,
+//     totalStaked: 33939393993,
+//     rewardReserve: 1000,
+//     rewardRate: 5,
+//   },
+//   {
+//     id: "2",
+//     totalStakers: 20,
+//     totalStaked: 33939393993,
+//     rewardReserve: 1000,
+//     rewardRate: 5,
+//   },
+// ];
 
-StakingPoolData = null
+// StakingPoolData = null;
 const StakingPools = () => {
   const { isConnected, address } = useWeb3ModalAccount();
+
+  let StakingPools = useMyStakingPools();
+
+  StakingPools = StakingPools.data;
+
+  console.log("StakingPoolData", StakingPools);
 
   return isConnected && address ? (
     <div className="mt-8">
@@ -66,15 +72,15 @@ const StakingPools = () => {
             </tr>
           </thead>
           <tbody>
-            {StakingPoolData?.map((data, key) => (
+            {StakingPools?.map((data, key) => (
               <tr
                 key={data.id}
                 className="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700"
               >
-                <td className="px-6 py-4">{data.totalStakers}</td>
-                <td className="px-6 py-4">{data.totalStaked}</td>
-                <td className="px-6 py-4">{data.rewardReserve}</td>
-                <td className="px-6 py-4">{data.rewardRate}</td>
+                <td className="px-6 py-4 text-white">{data[0]}</td>
+                <td className="px-6 py-4">{data[1]}</td>
+                <td className="px-6 py-4">{data[2]}</td>
+                <td className="px-6 py-4">{data[3]}</td>
                 <td className="px-6 py-4">
                   <div className="flex gap-x-4">
                     <Button
@@ -104,7 +110,7 @@ const StakingPools = () => {
             ))}
           </tbody>
         </table>
-        {!StakingPoolData?.length ? "No Staking Pool Available" : ""}
+        {!StakingPools?.length ? "No Staking Pool Available" : ""}
       </div>
     </div>
   ) : (
