@@ -8,13 +8,13 @@ import {
   Text,
   Button,
 } from "@radix-ui/themes";
-import { getReadOnlyProvider } from "../constants/providers";
-import useUserRewardTokenBalance from "../hooks/useUserRewardTokenBalance";
+
 import { useWeb3ModalAccount } from "@web3modal/ethers/react";
 import useMyStakingPools from "../hooks/useMyStakingPools";
 import useStakeToken from "../hooks/useStakeToken";
 import { toast } from "react-hot-toast";
 import useUnstakeToken from "../hooks/useUnstakeToken";
+import useClaimReward from "../hooks/useClaimReward";
 
 const StakingPools = () => {
   const { isConnected, address } = useWeb3ModalAccount();
@@ -29,6 +29,8 @@ const StakingPools = () => {
   const [amount, setAmount] = useState("");
 
   const { unstake, unstakeLoading } = useUnstakeToken();
+
+  const { claimReward, claimRewardLoading } = useClaimReward();
 
   return isConnected && address ? (
     <div className="mt-8">
@@ -104,7 +106,11 @@ const StakingPools = () => {
                             <Button
                               variant="soft"
                               color="blue"
-                              disabled={stakeLoading || unstakeLoading}
+                              disabled={
+                                stakeLoading ||
+                                unstakeLoading ||
+                                claimRewardLoading
+                              }
                               onClick={async () => {
                                 if (amount <= 0)
                                   return toast.error(
@@ -121,7 +127,9 @@ const StakingPools = () => {
                       </Dialog.Content>
                     </Dialog.Root>
                     <Button
-                      disabled={stakeLoading || unstakeLoading}
+                      disabled={
+                        stakeLoading || unstakeLoading || claimRewardLoading
+                      }
                       className="font-medium text-white-600 dark:text-white hover:underline"
                       onClick={async () => {
                         await unstake(index);
@@ -130,9 +138,13 @@ const StakingPools = () => {
                       Unstake
                     </Button>
                     <Button
-                      href="#"
+                      disabled={
+                        stakeLoading || unstakeLoading || claimRewardLoading
+                      }
                       className="font-medium text-white-600 dark:text-white hover:underline"
-                      // onClick={}
+                      onClick={async () => {
+                        await claimReward(index);
+                      }}
                     >
                       Claim Rewards
                     </Button>
