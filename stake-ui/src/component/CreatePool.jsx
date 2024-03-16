@@ -1,17 +1,8 @@
 import { useEffect, useState } from "react";
-import {
-  Box,
-  Card,
-  TextField,
-  Dialog,
-  Flex,
-  Text,
-  Button,
-} from "@radix-ui/themes";
-import { formatEther, parseEther } from "ethers";
-import { getReadOnlyProvider } from "../constants/providers";
+import { TextField, Dialog, Flex, Text, Button } from "@radix-ui/themes";
+import { parseEther } from "ethers";
 import useUserRewardTokenBalance from "../hooks/useUserRewardTokenBalance";
-import useGetLatestBlock from "../hooks/useGetLatestBlock";
+
 import { useWeb3ModalAccount } from "@web3modal/ethers/react";
 import useCreatePool from "../hooks/useCreateStakePool";
 import { toast } from "react-hot-toast";

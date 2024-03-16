@@ -6,22 +6,6 @@ import { formatEther } from "ethers";
 // import useGetLatestBlock from "../hooks/useGetLatestBlock";
 
 const HeroStats = () => {
-  // const [reward, setReward] = useState < string > "";
-  // const blockNumber = useGetLatestBlock();
-
-  // useEffect(() => {
-  //   const tokenContract = getTokenContract(getReadOnlyProvider);
-
-  //   tokenContract
-  //     .balanceOf(import.meta.env.VITE_staking_contract)
-  //     .then((res) => {
-  //       setReward(parseFloat(formatEther(res.toString())).toFixed(2));
-  //     })
-  //     .catch((err) => {
-  //       console.error("Error:", err);
-  //     });
-  // }, [blockNumber]);
-
   return (
     <Flex gap="5" direction="rows">
       <Card size="1" style={{ width: 200 }}>

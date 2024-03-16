@@ -8,37 +8,13 @@ import {
   Text,
   Button,
 } from "@radix-ui/themes";
-import { formatEther } from "ethers";
 import { getReadOnlyProvider } from "../constants/providers";
 import useUserRewardTokenBalance from "../hooks/useUserRewardTokenBalance";
 import { useWeb3ModalAccount } from "@web3modal/ethers/react";
 import useMyStakingPools from "../hooks/useMyStakingPools";
+import useStakeToken from "../hooks/useStakeToken";
+import { toast } from "react-hot-toast";
 
-// let StakingPoolData = [
-//   {
-//     id: "0",
-//     totalStakers: 20,
-//     totalStaked: 33939393993,
-//     rewardReserve: 1000,
-//     rewardRate: 5,
-//   },
-//   {
-//     id: "1",
-//     totalStakers: 20,
-//     totalStaked: 33939393993,
-//     rewardReserve: 1000,
-//     rewardRate: 5,
-//   },
-//   {
-//     id: "2",
-//     totalStakers: 20,
-//     totalStaked: 33939393993,
-//     rewardReserve: 1000,
-//     rewardRate: 5,
-//   },
-// ];
-
-// StakingPoolData = null;
 const StakingPools = () => {
   const { isConnected, address } = useWeb3ModalAccount();
 
@@ -47,6 +23,9 @@ const StakingPools = () => {
   StakingPools = StakingPools.data;
 
   console.log("StakingPoolData", StakingPools);
+
+  const { stake, stakeLoading } = useStakeToken();
+  const [amount, setAmount] = useState("");
 
   return isConnected && address ? (
     <div className="mt-8">
@@ -83,13 +62,77 @@ const StakingPools = () => {
                 <td className="px-6 py-4">{data[3]}</td>
                 <td className="px-6 py-4">
                   <div className="flex gap-x-4">
-                    <Button
+                    {/* <Button
                       href="#"
                       className="font-medium text-white-600 dark:text-white hover:underline"
                       // onClick={}
                     >
                       Stake
-                    </Button>
+                    </Button> */}
+                    <Dialog.Root>
+                      <Dialog.Trigger>
+                        <Button size="3" variant="soft" className="bg-blue">
+                          Stake
+                        </Button>
+                      </Dialog.Trigger>
+
+                      <Dialog.Content style={{ maxWidth: 450 }}>
+                        <Dialog.Title>Stake into the Pool</Dialog.Title>
+                        <Flex direction="column" gap="3">
+                          <label>
+                            <Text as="div" size="2" mb="1" weight="bold">
+                              Stake Amount
+                            </Text>
+                            <TextField.Input
+                              placeholder="Enter your stake amount"
+                              value={amount}
+                              onChange={(e) => setAmount(e.target.value)}
+                            />
+                          </label>
+                        </Flex>
+
+                        <Flex gap="3" mt="4" justify="end">
+                          <Dialog.Close>
+                            <Button variant="soft" color="gray">
+                              Cancel
+                            </Button>
+                          </Dialog.Close>
+                          <Dialog.Close>
+                            <Button
+                              variant="soft"
+                              color="blue"
+                              disabled={stakeLoading}
+                              onClick={async () => {
+                                if (amount <= 0)
+                                  return toast.error(
+                                    "Stake Amount must be greater than 0"
+                                  );
+                                await stake(index, amount);
+                                setAmount("");
+                              }}
+                              // onClick={async () => {
+                              //   if (rewardRate <= 0)
+                              //     return toast.error(
+                              //       "Reward rate must be greater than 0"
+                              //     );
+                              //   if (isNaN(Number(rewardRate)))
+                              //     return toast.error(
+                              //       "Require number for reward rate"
+                              //     );
+                              //   if (rewardBalance < rewardTokenAmountNeeded)
+                              //     return toast.error(
+                              //       "Balance to small to create staking pool"
+                              //     );
+                              //   await createStakingPool(rewardRate);
+                              //   setRewardRate("");
+                              // }}
+                            >
+                              Stake
+                            </Button>
+                          </Dialog.Close>
+                        </Flex>
+                      </Dialog.Content>
+                    </Dialog.Root>
                     <Button
                       href="#"
                       className="font-medium text-white-600 dark:text-white hover:underline"

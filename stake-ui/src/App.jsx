@@ -26,7 +26,7 @@ function App() {
     <Container>
       <Header />
       <main className="mt-10 mb-4">
-        <HeroStats />
+        {/* <HeroStats /> */}
         <Separator color="cyan" my="4" size="4" />
         <Text className="text-lg font-extrabold text-left ">Pool Creation</Text>
       </main>
