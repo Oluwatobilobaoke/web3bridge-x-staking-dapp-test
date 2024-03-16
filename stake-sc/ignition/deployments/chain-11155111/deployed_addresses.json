@@ -1,0 +1,5 @@
+{
+  "StakeTokenModule#ERC20Token": "0xa43219063dE1CAEfd06B4dbb9E4941Cb40f96Ce5",
+  "StakeRewardTokenModule#ERC20Token": "0xB41ebA4E68a21A63102e35Cb6D62E6EA8a1A21Df",
+  "StakeRewardTokenModule#StakingPool": "0x1DDFa38613be576B546b4642768292cdC0991573"
+}
